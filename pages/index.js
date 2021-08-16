@@ -6,17 +6,23 @@ export default function Home() {
   const [buyAmount, setBuyAmount] = useState(1);
   const [profitLoss, setProfitLoss] = useState(0);
   const [isLoss, setIsLoss] = useState(null);
-  const [bgColor, setBgColor] = useState("bg-red-50");
-
+  const [profitPercentage, setProfitPercentage] = useState(0);
   const calculateProfitLoss = (buyPrice, sellPrice, buyAmount) => {
     const profitLoss = (sellPrice - buyPrice) * buyAmount;
     setIsLoss(profitLoss < 0 ? true : false);
     return profitLoss;
   };
 
+  const calculateProfitPercentage = (buyPrice, sellPrice, buyAmount) => {
+    const profitPercentage = ((sellPrice - buyPrice) / buyPrice) * 100;
+    setProfitPercentage(profitPercentage.toPrecision(2));
+    return profitPercentage;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setProfitLoss(calculateProfitLoss(buyPrice, sellPrice, buyAmount));
+    calculateProfitPercentage(buyPrice, sellPrice, buyAmount);
   };
   const handleReset = (e) => {
     e.preventDefault();
@@ -57,13 +63,13 @@ export default function Home() {
                 className="block text-gray-700 text-sm font-bold mb-2"
                 htmlFor="buyPrice"
               >
-                Buying Price
+                Buying Price per stock
               </label>
               <input
                 required
                 id="buyPrice"
                 value={buyPrice}
-                onChange={(e) => setBuyPrice(Number(e.target.value))}
+                onChange={(e) => setBuyPrice(e.target.value)}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 type="number"
               />
@@ -79,7 +85,7 @@ export default function Home() {
                 id="buyAmount"
                 required
                 value={buyAmount}
-                onChange={(e) => setBuyAmount(Number(e.target.value))}
+                onChange={(e) => setBuyAmount(e.target.value)}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 type="number"
               />
@@ -89,34 +95,46 @@ export default function Home() {
                 className="block text-gray-700 text-sm font-bold mb-2"
                 htmlFor="sellPrice"
               >
-                Sell Price
+                Current Price per stock
               </label>
               <input
                 id="sellPrice"
                 required
                 value={sellPrice}
-                onChange={(e) => setSellPrice(Number(e.target.value))}
+                onChange={(e) => setSellPrice(e.target.value)}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 type="number"
               />
             </div>
-            <div className="md:flex md:items-center">
-              <div className="md:w-1/3" />
-              <div className="md:w-2/3">
-                <button
-                  className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
-                  type="submit"
-                >
-                  Calculate
-                </button>
-              </div>
-            </div>
+            <button
+              className="shadow bg-blue-500 hover:bg-blue-400 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+              type="submit"
+            >
+              Calculate
+            </button>
 
             <div>
               {isLoss !== null ? (
                 <span>
-                  {isLoss ? `Loss = ${profitLoss}` : `Profit = ${profitLoss}`}
+                  {isLoss ? `Loss = $${profitLoss}` : `Profit = $${profitLoss}`}
                 </span>
+              ) : null}
+              {isLoss !== null ? (
+                <div
+                  className={`mt-2 
+                ${
+                  isLoss !== null
+                    ? isLoss == true
+                      ? "text-red-700 text-2xl font-bold"
+                      : "text-green-600 text-2xl font-bold"
+                    : "text-blue-50"
+                }
+                `}
+                >
+                  {isLoss
+                    ? `⬇️ ${profitPercentage}% `
+                    : `⬆ +${profitPercentage}% `}
+                </div>
               ) : null}
             </div>
 
